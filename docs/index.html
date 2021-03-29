@@ -258,7 +258,7 @@
 				wtShare:"Share via whatsapp",
 				otShare:"Copy link",
 				wtMessage1:"your freind",
-				wtMessage2:"congratulates you\nOpen this link below:\n"
+				wtMessage2:"congratulates you.\nOpen this link below:\n"
 			},
 			ar:{
 				me:"المرسل",
@@ -271,7 +271,7 @@
 				wtShare:"إرسال عبر الواتسأب",
 				otShare:"نسخ الرابط",
 				wtMessage1:"يقوم صديقك",
-				wtMessage2:"بتهنئتك\nإفتح هذا الرابط أدناه:\n"
+				wtMessage2:"بتهنئتك.\nإفتح هذا الرابط أدناه:\n"
 			}
 		}
 		
@@ -338,7 +338,7 @@
 		});
 		wtShare.addEventListener("click",function(){
 			var a = document.createElement("a");
-			a.href = "whatsapp://send?text="+window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ n +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value;
+			a.href = "whatsapp://send?text="+window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value;
 			a.setAttribute("data-action","share/whatsapp/share");
 			document.body.appendChild(a);
 			a.click();
