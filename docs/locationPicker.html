@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>location picker</title>
+	<meta charset="utf-8"/>
+	<style>
+		*{
+			padding:0;
+			margin:0;
+		}
+		body{
+			display:flex;
+			align-items:center;
+			justify-content:center;
+			min-height:100vh;
+			background:linear-gradient(skyblue,navy);
+		}
+		#container{
+			display:flex;
+			align-items:center;
+			justify-content:center;
+			flex-direction:column;
+			width:350px;
+			background:#eee;
+			box-shadow:0 0 10px #000;
+			border-radius:20px;
+			padding:20px;
+		}
+		#container *{
+			padding:20px;
+			margin:8px;
+			font-size:22px;
+		}
+		#container button{
+			border:none;
+			border-radius:20px;
+			width:90%;
+			background:lightgreen;
+		}
+		#container span.red{
+			color:darkred;
+		}
+		#container span.green{
+			color:green;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<button id="picker">pick my location</button>
+		<span id="locationTxt">your location here</span>
+	</div>
+	<script>
+		var picker = document.getElementById("picker");
+		var locationTxt = document.getElementById("locationTxt");
+		
+		picker.addEventListener("click",getLocation);
+		
+		function getLocation() {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(showPosition,showError);
+			}
+			else{
+				locationTxt.innerHTML = "Geolocation is not supported by this browser.";
+				locationTxt.className = "red";
+			}
+		}
+		function showPosition(position) {
+			locationTxt.innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
+			locationTxt.className = "green";
+		}
+		function showError(error) {
+			switch(error.code) {
+			case error.PERMISSION_DENIED:
+				locationTxt.innerHTML = "User denied the request for Geolocation.";
+				break;
+			case error.POSITION_UNAVAILABLE:
+				locationTxt.innerHTML = "Location information is unavailable.";
+				break;
+			case error.TIMEOUT:
+				locationTxt.innerHTML = "The request to get user location timed out.";
+				break;
+			case error.UNKNOWN_ERROR:
+				locationTxt.innerHTML = "An unknown error occurred.";
+				break;
+			}
+			locationTxt.className = "red";
+		} 
+	</script>
+</body>
+</html>
