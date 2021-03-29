@@ -29,6 +29,7 @@
 			color:#fff;
 			z-index:1;
 			font-family:Tangerine;
+			text-align:center;
 		}
 		.container .text.ar *{
 			font-family: 'Reem Kufi', sans-serif;
@@ -36,16 +37,21 @@
 		.container .text p{
 			font-size:30px;
 			white-space:nowrap;
+			text-shadow:0 0 10px #000;
+			font-weight:700;
+		}
+		.red{
+			color:#000;
 		}
 		.container .text h2{
-			font-size:60px;
+			font-size:40px;
 			font-weight:900;
 			white-space:nowrap;
 			text-shadow:0 0 10px #000;
 		}
 		.container .text span{
-			font-size:40px;
-			font-weight:500;
+			font-size:35px;
+			font-weight:700;
 			white-space:nowrap;
 			text-shadow:0 0 10px #000;
 		}
@@ -191,6 +197,9 @@
 			}
 		}
 		@media(min-width:700px){
+			.popup{
+				width:400px;
+			}
 			.container .text h2{
 				font-size:100px;
 			}
@@ -208,6 +217,11 @@
 				transform-origin:0 100%;
 			}
 		}
+		canvas{
+			position:absolute;
+			top:0;
+			left:0;
+		}
 	</style>
 </head>
 <body>
@@ -220,41 +234,43 @@
 			<span id="ty">To you and your family</span>
 		</div>
 		<div class="mosque m2"></div>
+		<canvas id="canvas"></canvas>
 		<div class="mosque"></div>
-		<button id="shareBtn">send congratulations</button>
+		<button id="shareBtn">send congratulations to freinds</button>
 		<div class="popup">
 			<button id="closePop">&times;</button>
 			<h1 id="heading">Send</h1>
-			<input id="username" placeholder="Type your name">
+			<input id="username" placeholder="Type your name first">
 			<button id="wtShare">share via whatsapp</button>
 			<button id="otShare">copy link</button>
 		</div>
 	</div>
 	<script>
-	var dictionary = {
-		en:{
-			me: "I",
-			ramadanMubarak:"Ramadan Mubarak",
-			congratulates:"&nbsp; Congratulates you:",
-			toYou:"To you and your family",
-			shareButton:"send congratulations",
-			send:"Send",
-			placeholder:"Type your name",
-			wtShare:"Share via whatsapp",
-			otShare:"Copy link"
-		},
-		ar:{
-			me:"المرسل",
-			ramadanMubarak:"رمضان مبارك",
-			congratulates:"يهنئك",
-			toYou:"لك و لعائلتك",
-			shareButton:"ارسال تهنئة",
-			send:"إرسال",
-			placeholder:"اكتب اسمك",
-			wtShare:"إرسال عبر الواتسأب",
-			otShare:"نسخ الرابط"
+		var dictionary = {
+			en:{
+				me: "I",
+				ramadanMubarak:"Ramadan Mubarak",
+				congratulates:"&nbsp; Congratulates you:",
+				toYou:"To you and your family",
+				shareButton:"send congratulations to freinds",
+				send:"Send",
+				placeholder:"Type your name first",
+				wtShare:"Share via whatsapp",
+				otShare:"Copy link"
+			},
+			ar:{
+				me:"المرسل",
+				ramadanMubarak:"رمضان مبارك",
+				congratulates:"يهنئك",
+				toYou:"لك و لعائلتك",
+				shareButton:"ارسال تهنئة الى الأصدقاء",
+				send:"إرسال",
+				placeholder:"أكتب إسمك أولاً",
+				wtShare:"إرسال عبر الواتسأب",
+				otShare:"نسخ الرابط"
+			}
 		}
-	}
+		
 		var lang = "en";
 		var named = document.getElementById("name");
 		var ty = document.getElementById("ty");
@@ -267,6 +283,11 @@
 		var wtShare = document.getElementById("wtShare");
 		var otShare = document.getElementById("otShare");
 		var username = document.getElementById("username");
+		var container = document.getElementsByClassName("container")[0];
+		var c = document.getElementById("canvas");
+		var ctx = c.getContext("2d");
+		var particles = [];
+		var frames = 0;
 		var arPat = /[\u0621-\u064A]+/;
 		var numPat = /^[0-9]$/;
 		var arabic = new RegExp("(" + arPat.source + ")|(" + numPat.source + ")");
@@ -274,7 +295,10 @@
 			lang = "ar";
 			document.getElementsByClassName("text")[0].className = "text ar";
 		}
-		named.innerHTML = n +" "+ dictionary[lang].congratulates;
+		if(getParameterByName("g") == "f" && lang == "ar"){
+			dictionary[lang].congratulates = "تهنئك";
+		}
+		named.innerHTML = "<span class='red'>"+n+ "</span>"+" "+ dictionary[lang].congratulates;
 		rm.innerHTML = dictionary[lang].ramadanMubarak;
 		ty.innerHTML = dictionary[lang].toYou;
 		shareBtn.innerHTML = dictionary[lang].shareButton;
@@ -296,8 +320,12 @@
 			var vh = window.innerHeight * 0.01;
 			document.documentElement.style.setProperty('--vh', vh+"px");
 		}
-		window.addEventListener("load",cssVarChange);
-		window.addEventListener("resize",cssVarChange);
+		function cResize(){
+			c.width = window.innerWidth;
+			c.height = window.innerHeight;
+		}
+		window.addEventListener("load",function (){cssVarChange();cResize();animate();});
+		window.addEventListener("resize",function (){cssVarChange();cResize();});
 		shareBtn.addEventListener("click",function(){
 			popup.style.display = "flex";
 		});
@@ -311,6 +339,7 @@
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
+			popup.style.display = "none";
 		});
 		otShare.addEventListener("click",function(){
 			var el = document.createElement('textarea');
@@ -320,7 +349,77 @@
 			el.setSelectionRange(0,99999);
 			document.execCommand('copy');
 			document.body.removeChild(el);
+			popup.style.display = "none";
 		});
+		function Particle(){
+			this.r = getRndFloat(1,3);
+			this.x = getRndFloat(this.r,100-this.r);
+			this.y = 100 + this.r;
+			
+			this.vx = 0.05;
+			this.rvx = {min:-0.5,max:0.5};
+			this.ax = getRndFloat(-0.05,0.05);
+			
+			this.vy = -1;
+			this.rvy = {min:0,max:-2.5};
+			this.ay = getRndFloat(-1,-0.75);
+			
+			this.del = false;
+			
+			this.draw = function(){
+				var px = c.width/100;
+				var py = c.height/100;
+				ctx.fillStyle = "#fff";
+				ctx.shadowColor = "#eee";
+				ctx.shadowBlur = 60;
+				ctx.beginPath();
+				ctx.arc(this.x*px,this.y*py,this.r*px,0,2*Math.PI);
+				ctx.fill();
+				ctx.closePath();
+				ctx.shadowColor = "rgba(0,0,0,0)";
+			}
+			this.update = function(){
+				this.x += this.vx;
+				this.y += this.vy;
+				if(this.vx+this.ax<this.rvx.max && this.vx+this.ax>this.rvx.min){this.vx+=this.ax;}
+				if(this.vy+this.ay<this.rvy.max && this.vy+this.ay>this.rvy.min){this.vy+=this.ay;}
+				if(this.y-this.r<0){
+					this.del = true;
+				}
+				this.draw();
+			}
+		}
+		function animate(){
+			ctx.clearRect(0,0,c.width,c.height);
+			for(var i=0;i<particles.length;i++){
+				particles[i].update();
+				if(particles[i].del){
+					particles = remove(particles,i);
+				}
+			}
+			if(frames%10 == 0){
+				particles[particles.length] = new Particle();
+			}
+			frames++;
+			window.requestAnimationFrame(animate);
+		}
+		function getRndFloat(min, max) {
+			return Math.random() * (max - min) + min;
+		}
+		function remove(array,index){
+			var arr1 = [];
+			var arr2 = [];
+			for(var i = 0;i<index;i++){
+				arr1[arr1.length] = array[i];
+			}
+			for(var i=index+1;i<array.length;i++){
+				arr2[arr2.length] = array[i];
+			}
+			for(var i=0;i<arr2.length;i++){
+				arr1[arr1.length] = arr2[i];
+			}
+			return arr1;
+		}
 	</script>
 </body>
 </html>
