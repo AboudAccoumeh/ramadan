@@ -340,7 +340,7 @@
 		wtShare.addEventListener("click",function(){
 			if(arabic.test(username.value)){lang = "ar";}
 			var a = document.createElement("a");
-			a.href = "whatsapp://send?text="+window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value.split(" ").join("%20") +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
+			a.href = "whatsapp://send?text="+window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
 			a.setAttribute("data-action","share/whatsapp/share");
 			document.body.appendChild(a);
 			a.click();
@@ -349,7 +349,7 @@
 		});
 		otShare.addEventListener("click",function(){
 			var el = document.createElement('textarea');
-			el.value = window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value.split(" ").join("%20") +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
+			el.value = window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
 			document.body.appendChild(el);
 			el.select();
 			el.setSelectionRange(0,99999);
