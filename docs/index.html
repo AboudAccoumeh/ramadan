@@ -52,7 +52,7 @@
 			white-space:nowrap;
 			text-shadow:0 0 10px #000;
 		}
-		.red{
+		.container .text span.red{
 			color:#000;
 			font-weight:900 !IMPORTANT;
 			-webkit-text-stroke-width: 0.5px;
@@ -350,7 +350,7 @@
 		});
 		otShare.addEventListener("click",function(){
 			var el = document.createElement('textarea');
-			el.value = window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
+			el.value = dictionary[lang].wtMessage1 +" "+ username.value +" "+dictionary[lang].wtMessage2+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
 			document.body.appendChild(el);
 			el.select();
 			el.setSelectionRange(0,99999);
@@ -404,7 +404,7 @@
 					particles = remove(particles,i);
 				}
 			}
-			if(frames%8 == 0){
+			if(frames%10 == 0){
 				particles[particles.length] = new Particle();
 			}
 			frames++;
