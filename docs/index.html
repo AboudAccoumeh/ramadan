@@ -55,7 +55,7 @@
 		.red{
 			color:#000;
 			font-weight:900 !IMPORTANT;
-			-webkit-text-stroke-width: 2px;
+			-webkit-text-stroke-width: 0.5px;
  			-webkit-text-stroke-color: #fff;
 		}
 		.container .mosque{
@@ -404,7 +404,7 @@
 					particles = remove(particles,i);
 				}
 			}
-			if(frames%5 == 0){
+			if(frames%8 == 0){
 				particles[particles.length] = new Particle();
 			}
 			frames++;
