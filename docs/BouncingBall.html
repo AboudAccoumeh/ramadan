@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>bouncing ball</title>
+<style type="text/css">
+*{
+margin:0;
+padding:0;
+}
+canvas{
+position:absolute;
+top:0;
+left:0;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas">sorry, your browser/phone does not support my game😟</canvas>
+<script type="text/javascript">
+var c = document.getElementById("canvas");
+var ctx = c.getContext("2d");
+var obstacles = [];
+var player = new Player(50,50);
+
+obstacles[0] = new Obstacle(0,98,100,4);
+for(var y=-5000;y<80;y+=10){
+	obstacles[obstacles.length] = new Obstacle(Math.random()*92 ,y+5,8,3);
+}
+window.addEventListener("load",function(){
+loop();
+c.width = window.innerWidth;
+c.height = window.innerHeight;
+});
+window.addEventListener("resize",function(){
+c.width = window.innerWidth;
+c.height = window.innerHeight;
+});
+window.addEventListener("touchstart",function(e){
+	e = e || window.event;
+	e.preventDefault();
+	if(e.touches[0].clientX < window.innerWidth/2){
+		player.vx = -1.2;
+	}else{
+		player.vx = 1.2;
+	}
+});
+window.addEventListener("touchmove",function(e){
+	e = e || window.event;
+	e.preventDefault();
+	if(e.touches[0].clientX < window.innerWidth/2){
+		player.vx = -1.2;
+	}else{
+		player.vx = 1.2;
+	}
+});
+window.addEventListener("touchend",function(){
+	player.vx = 0;
+});
+function Player(x,y){
+	this.x = x;
+	this.y = y;
+	this.radius = 2;
+	this.vx = 0;
+	this.vy = -0.2;
+	this.ax = 0;
+	this.ay = 0;
+	this.hue = 0;
+	this.gravity = 0.005;
+	this.draw = function(){
+		var prx = c.width/100;
+		var pry = c.height/100;
+		ctx.fillStyle = "hsl("+this.hue+",80%,50%)";
+		ctx.beginPath();
+		ctx.arc(this.x*prx,this.y*pry,this.radius*(prx+pry)/2,0,2*Math.PI);
+		ctx.closePath();
+		ctx.fill();
+	}
+	this.update = function(){
+		var prx = c.width/100;
+		var pry = c.height/100;
+		this.x += this.vx;
+		this.y += this.vy;
+		this.vx += this.ax;
+		this.vy += this.ay;
+		this.ay += this.gravity;
+		this.hue+=2;
+		if(this.x<0){this.x=100}
+		else if(this.x>100){this.x=0}
+		
+		for(var i=0;i<obstacles.length;i++){
+			if(rectsColliding([this.x*prx-this.radius*(prx+pry)/2,this.y*pry-this.radius*(prx+pry)/2,2*this.radius*(prx+pry)/2,2*this.radius*(prx+pry)/2],[obstacles[i].x*prx,obstacles[i].y*pry,obstacles[i].width*prx,obstacles[i].height*pry]) && this.vy > 0){
+				this.ay = -0.05;
+				this.vy = -1.2;
+				this.y = obstacles[i].y - (this.radius*(prx+pry)/2)/pry;
+			}
+		}
+		if(this.y*pry - (this.radius*(prx+pry)/2) < 0.48*c.height){
+			var dif = (0.48*c.height) - (this.y*pry - (this.radius*(prx+pry)/2));
+			player.y = 48 + (this.radius*(prx+pry)/2)/pry;
+			for(var i=0;i<obstacles.length;i++){
+				obstacles[i].y += dif/pry;
+			}
+		}
+		if(this.y*pry + (this.radius*(prx+pry)/2) > 0.98*c.height){
+			var dif = (this.y*pry + (this.radius*(prx+pry)/2)) - (0.98*c.height);
+			player.y = 98 - (this.radius*(prx+pry)/2)/pry;
+			for(var i=0;i<obstacles.length;i++){
+				obstacles[i].y -= dif/pry;
+			}
+		}
+	}
+}
+
+function Obstacle(x,y,width,height,type){
+	this.x = x;
+	this.y = y;
+	this.vx = 0.05;
+	this.width = width;
+	this.height = height;
+	this.type = type;
+	this.del = false;
+	this.draw = function(){
+		var prx = c.width/100;
+		var pry = c.height/100;
+		ctx.fillStyle = "red";
+		ctx.fillRect(this.x*prx,this.y*pry,this.width*prx,this.height*pry);
+	}
+	this.update = function(){
+		this.x += this.vx;
+		if(this.x+this.width >= 100 && this.vx > 0){this.vx *= -1;}
+		else if(this.x <= 0 && this.vx < 0){this.vx *= -1;}
+		if(this.y > 100){
+			this.del = true;
+		}
+	}
+
+}
+function rectsColliding(r1,r2){
+	return !(r1[0]>r2[0]+r2[2] ||
+			r1[0]+r1[2]<r2[0] ||
+			r1[1]>r2[1]+r2[3] ||
+			r1[1]+r1[3]<r2[1]
+	);
+}
+
+function remove(array,index){
+	var arr1 = [];
+	var arr2 = [];
+	for(var i = 0;i<index;i++){
+		arr1[arr1.length] = array[i];
+	}
+	for(var i=index+1;i<array.length;i++){
+		arr2[arr2.length] = array[i];
+	}
+	for(var i=0;i<arr2.length;i++){
+		arr1[arr1.length] = arr2[i];
+	}
+	return arr1;
+}
+
+function loop(){
+	ctx.fillStyle = "rgba(255,255,255,0.4)";
+	ctx.clearRect(0,0,c.width,c.height);
+	player.update();
+	player.draw();
+	for(var d=0;d<obstacles.length;d++){
+		if(obstacles[d].del === true){
+			obstacles = remove(obstacles,d);
+		}
+	}
+	for(var i = 0; i < obstacles.length; i++){
+		obstacles[i].update();
+		obstacles[i].draw();
+	}
+/*	ctx.fillStyle = "blue";
+	ctx.beginPath();
+	ctx.moveTo(0,0.48*c.height);
+	ctx.lineTo(c.width,0.48*c.height);
+	ctx.closePath();
+	ctx.stroke();
+	ctx.fillStyle = "blue";
+	ctx.beginPath();
+	ctx.moveTo(0,0.92*c.height);
+	ctx.lineTo(c.width,0.92*c.height);
+	ctx.closePath();
+	ctx.stroke();*/
+	window.requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
