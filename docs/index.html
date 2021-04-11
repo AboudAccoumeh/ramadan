@@ -57,6 +57,9 @@
 			-webkit-text-stroke-width: 0.5px;
  			-webkit-text-stroke-color: #fff;
 		}
+		.container .text.ar span.red{
+			-webkit-text-stroke-color:transparent;
+		}
 		.container .mosque{
 			position:absolute;
 			left:0;
@@ -342,6 +345,7 @@
 		});
 		wtShare.addEventListener("click",function(){
 			if(arabic.test(username.value)){lang = "ar";}
+			else{lang = "en";}
 			var a = document.createElement("a");
 			a.href = "whatsapp://send?text="+window.encodeURIComponent(dictionary[lang].wtMessage1)+" "+ username.value +" "+window.encodeURIComponent(dictionary[lang].wtMessage2)+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+window.encodeURIComponent(username.value.toString().split(" ").join("%20"));
 			a.setAttribute("data-action","share/whatsapp/share");
@@ -351,6 +355,8 @@
 			popup.style.display = "none";
 		});
 		otShare.addEventListener("click",function(){
+			if(arabic.test(username.value)){lang = "ar";}
+			else{lang = "en";}
 			var el = document.createElement('textarea');
 			el.value = dictionary[lang].wtMessage1 +" "+ username.value +" "+dictionary[lang].wtMessage2+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"?n="+username.value.split(" ").join("%20");
 			document.body.appendChild(el);
